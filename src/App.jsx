@@ -23,6 +23,7 @@ function App() {
   const isDrawing = useRef();
   const currentShapeId = useRef();
 
+  const isDraggable = action === ACTIONS.SELECT;
 
   function onPointerDown() {
     if (action === ACTIONS.SELECT) return;
@@ -236,6 +237,7 @@ function App() {
                 fill={rectangle.fillColor}
                 height={rectangle.height}
                 width={rectangle.width}
+                draggable={isDraggable}
               />
             ))}
             {circles.map((circle) => (
@@ -247,6 +249,7 @@ function App() {
                 stroke={strokeColor}
                 strokeWidth={2}
                 fill={circle.fillColor}
+                draggable={isDraggable}
               />
             ))}
             {arrows.map((arrow) => (
@@ -256,6 +259,7 @@ function App() {
                 stroke={strokeColor}
                 strokeWidth={2}
                 fill={arrow.fillColor}
+                draggable={isDraggable}
               />
             ))}
             {scribbles.map((scribble) => (
@@ -267,6 +271,7 @@ function App() {
                 stroke={strokeColor}
                 strokeWidth={2}
                 fill={scribble.fillColor}
+                draggable={isDraggable}
               />
             ))}
           </Layer>
