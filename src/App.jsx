@@ -45,6 +45,24 @@ function App() {
     }
   }
   function onPointerMove() { 
+    if(action === ACTIONS.SELECT) return;
+    const stage = stageRef.current;
+    const{x,y}= stage.getPointerPosition();
+
+    switch(action){
+      case ACTIONS.RECTANGLE:
+        setRectangles((rectangles) => rectangles.map((rectangle) => {
+          if(rectangle.id===currentShapeId.current){
+            return{
+              ...rectangle,
+              width: x - rectangle.x,
+              height: y - rectangle.y,
+            };
+          }
+          return rectangle;
+        }))
+      break;
+    }
   }
   function onPointerUp() { }
 
