@@ -8,16 +8,45 @@ import { MdFileDownload } from "react-icons/md";
 import { Layer, Rect, Stage } from "react-konva";
 import { useRef, useState } from "react";
 import { ACTIONS } from "./constants";
+import {v4 as uuidv4} from "uuid";
 
 function App() {
   const stageRef = useRef();
   const [action, setAction] = useState(ACTIONS.SELECT);
   const [fillColor, setFillColor] = useState("#000000");
+  const [rectangles, setRectangles]= useState([])
+  
   const strokeColor="#000000"
+  const isDrawing = useRef();
+  const currentShapeId = useRef();
+ 
 
-  function onPointerMove() { }
+  function onPointerDown() { 
+    if(action === ACTIONS.SELECT) return;
+    const stage = stageRef.current;
+    const{x,y}= stage.getPointerPosition();
+    const id = uuidv4();
+
+    currentShapeId.current = id;
+    isDrawing.current=true;
+
+    switch(action){
+      case ACTIONS.RECTANGLE:
+        setRectangles((rectangles) => [...rectangles,{
+          id,
+          x,
+          y,
+          height:20,
+          width:20,
+          fillColor,
+        },
+      ]);
+      break;
+    }
+  }
+  function onPointerMove() { 
+  }
   function onPointerUp() { }
-  function onPointerDown() { }
 
   function handleExport() {
     const url = stageRef.current.toDataURL();
@@ -109,6 +138,19 @@ function App() {
               fill="#ffffff"
               id="bg"
             />
+
+            {rectangles.map((rectangle) =>(
+              <Rect
+                key={rectangle.id}
+                x={rectangle.x}
+                y={rectangle.y}
+                stroke={strokeColor}
+                strokeWidth={2}
+                fill={rectangle.fillColor}
+                height={rectangle.height}
+                width={rectangle.width}
+              />
+            ))}
           </Layer>
         </Stage>
 
