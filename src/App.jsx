@@ -5,66 +5,93 @@ import { FaRegCircle } from "react-icons/fa";
 import { FaLongArrowAltRight } from "react-icons/fa";
 import { FaPencilAlt } from "react-icons/fa";
 import { MdFileDownload } from "react-icons/md";
-import { Layer, Rect, Stage } from "react-konva";
+import { Layer, Rect, Stage, Circle } from "react-konva";
 import { useRef, useState } from "react";
 import { ACTIONS } from "./constants";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 function App() {
   const stageRef = useRef();
   const [action, setAction] = useState(ACTIONS.SELECT);
   const [fillColor, setFillColor] = useState("#000000");
-  const [rectangles, setRectangles]= useState([])
-  
-  const strokeColor="#000000"
+  const [rectangles, setRectangles] = useState([])
+  const [circles, setCircles] = useState([])
+
+  const strokeColor = "#000000"
   const isDrawing = useRef();
   const currentShapeId = useRef();
- 
 
-  function onPointerDown() { 
-    if(action === ACTIONS.SELECT) return;
+
+  function onPointerDown() {
+    if (action === ACTIONS.SELECT) return;
     const stage = stageRef.current;
-    const{x,y}= stage.getPointerPosition();
+    const { x, y } = stage.getPointerPosition();
     const id = uuidv4();
 
     currentShapeId.current = id;
-    isDrawing.current=true;
+    isDrawing.current = true;
 
-    switch(action){
+    switch (action) {
       case ACTIONS.RECTANGLE:
-        setRectangles((rectangles) => [...rectangles,{
+        setRectangles((rectangles) => [...rectangles, {
           id,
           x,
           y,
-          height:20,
-          width:20,
+          height: 20,
+          width: 20,
           fillColor,
         },
-      ]);
-      break;
+        ]);
+        break;
+      case ACTIONS.CIRCLE:
+        setCircles((circles) => [...circles, {
+          id,
+          x,
+          y,
+          radius: 20,
+          fillColor,
+        },
+        ]);
+        break;
     }
   }
-  function onPointerMove() { 
-    if(action === ACTIONS.SELECT) return;
-    const stage = stageRef.current;
-    const{x,y}= stage.getPointerPosition();
+  function onPointerMove() {
+    if (action === ACTIONS.SELECT || !isDrawing.current) return;
 
-    switch(action){
+    const stage = stageRef.current;
+    const { x, y } = stage.getPointerPosition();
+
+    switch (action) {
       case ACTIONS.RECTANGLE:
         setRectangles((rectangles) => rectangles.map((rectangle) => {
-          if(rectangle.id===currentShapeId.current){
-            return{
+          if (rectangle.id === currentShapeId.current) {
+            return {
               ...rectangle,
               width: x - rectangle.x,
               height: y - rectangle.y,
             };
           }
           return rectangle;
-        }))
+        })
+      );
+      break;
+      case ACTIONS.CIRCLE:
+        setCircles((circles) => circles.map((circle) => {
+          if (circle.id === currentShapeId.current) {
+            return {
+              ...circle,
+              radius: ((y - circle.y)**2 + (x - circle.x)**2)**0.5,
+            };
+          }
+          return circle;
+        })
+      );
       break;
     }
   }
-  function onPointerUp() { }
+  function onPointerUp() {
+    isDrawing.current = false;
+  }
 
   function handleExport() {
     const url = stageRef.current.toDataURL();
@@ -157,7 +184,7 @@ function App() {
               id="bg"
             />
 
-            {rectangles.map((rectangle) =>(
+            {rectangles.map((rectangle) => (
               <Rect
                 key={rectangle.id}
                 x={rectangle.x}
@@ -167,6 +194,17 @@ function App() {
                 fill={rectangle.fillColor}
                 height={rectangle.height}
                 width={rectangle.width}
+              />
+            ))}
+            {circles.map((circle) => (
+              <Circle
+                key={circle.id}
+                radius={circle.radius}
+                x={circle.x}
+                y={circle.y}
+                stroke={strokeColor}
+                strokeWidth={2}
+                fill={circle.fillColor}
               />
             ))}
           </Layer>
