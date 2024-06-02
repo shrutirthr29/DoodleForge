@@ -63,6 +63,14 @@ function App() {
         },
         ]);
         break;
+      case ACTIONS.SCRIBBLE:
+        setScribbles((scribbles) => [...scribbles, {
+          id,
+          points: [x,y],
+          fillColor,
+        },
+        ]);
+        break;
     }
   }
   function onPointerMove() {
@@ -106,6 +114,18 @@ function App() {
             };
           }
           return arrow;
+        })
+      );
+      break;
+      case ACTIONS.SCRIBBLE:
+        setScribbles((scribbles) => scribbles.map((scribble) => {
+          if (scribble.id === currentShapeId.current) {
+            return {
+              ...scribble,
+              points:[...scribble.points, x, y],
+            };
+          }
+          return scribble;
         })
       );
       break;
@@ -242,7 +262,8 @@ function App() {
               <Line
                 key={scribble.id}
                 lineCap="butt"
-                lineJoin="miter"
+                lineJoin="bevel"
+                points={scribble.points}
                 stroke={strokeColor}
                 strokeWidth={2}
                 fill={scribble.fillColor}
