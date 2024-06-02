@@ -5,7 +5,7 @@ import { FaRegCircle } from "react-icons/fa";
 import { FaLongArrowAltRight } from "react-icons/fa";
 import { FaPencilAlt } from "react-icons/fa";
 import { MdFileDownload } from "react-icons/md";
-import { Layer, Rect, Stage, Circle } from "react-konva";
+import { Layer, Rect, Stage, Circle, Arrow, Line } from "react-konva";
 import { useRef, useState } from "react";
 import { ACTIONS } from "./constants";
 import { v4 as uuidv4 } from "uuid";
@@ -16,6 +16,8 @@ function App() {
   const [fillColor, setFillColor] = useState("#000000");
   const [rectangles, setRectangles] = useState([])
   const [circles, setCircles] = useState([])
+  const [arrows, setArrows] = useState([])
+  const [scribbles, setScribbles] = useState([])
 
   const strokeColor = "#000000"
   const isDrawing = useRef();
@@ -53,6 +55,14 @@ function App() {
         },
         ]);
         break;
+      case ACTIONS.ARROW:
+        setArrows((arrows) => [...arrows, {
+          id,
+          points: [x,y,x+20,y+20],
+          fillColor,
+        },
+        ]);
+        break;
     }
   }
   function onPointerMove() {
@@ -84,6 +94,18 @@ function App() {
             };
           }
           return circle;
+        })
+      );
+      break;
+      case ACTIONS.ARROW:
+        setArrows((arrows) => arrows.map((arrow) => {
+          if (arrow.id === currentShapeId.current) {
+            return {
+              ...arrow,
+              points:[arrow.points[0], arrow.points[1], x, y],
+            };
+          }
+          return arrow;
         })
       );
       break;
@@ -205,6 +227,25 @@ function App() {
                 stroke={strokeColor}
                 strokeWidth={2}
                 fill={circle.fillColor}
+              />
+            ))}
+            {arrows.map((arrow) => (
+              <Arrow
+                key={arrow.id}
+                points={arrow.points}
+                stroke={strokeColor}
+                strokeWidth={2}
+                fill={arrow.fillColor}
+              />
+            ))}
+            {scribbles.map((scribble) => (
+              <Line
+                key={scribble.id}
+                lineCap="butt"
+                lineJoin="miter"
+                stroke={strokeColor}
+                strokeWidth={2}
+                fill={scribble.fillColor}
               />
             ))}
           </Layer>
