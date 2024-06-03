@@ -5,7 +5,7 @@ import { FaRegCircle } from "react-icons/fa";
 import { FaLongArrowAltRight } from "react-icons/fa";
 import { FaPencilAlt } from "react-icons/fa";
 import { MdFileDownload } from "react-icons/md";
-import { Layer, Rect, Stage, Circle, Arrow, Line } from "react-konva";
+import { Layer, Rect, Stage, Circle, Arrow, Line, Transformer } from "react-konva";
 import { useRef, useState } from "react";
 import { ACTIONS } from "./constants";
 import { v4 as uuidv4 } from "uuid";
@@ -22,6 +22,7 @@ function App() {
   const strokeColor = "#000000"
   const isDrawing = useRef();
   const currentShapeId = useRef();
+  const transformerRef = useRef();
 
   const isDraggable = action === ACTIONS.SELECT;
 
@@ -33,6 +34,7 @@ function App() {
 
     currentShapeId.current = id;
     isDrawing.current = true;
+
 
     switch (action) {
       case ACTIONS.RECTANGLE:
@@ -145,6 +147,12 @@ function App() {
     link.click();
     document.body.removeChild(link);
   }
+
+  function onClick(e) {
+    if(action !== ACTIONS.SELECT) return;
+    const target = e.currentTarget;
+    transformerRef.current.nodes([target]);
+  }
   return (
     <>
       <div className='relative w-full h-screen overflow-hidden'>
@@ -238,6 +246,7 @@ function App() {
                 height={rectangle.height}
                 width={rectangle.width}
                 draggable={isDraggable}
+                onClick={onClick}
               />
             ))}
             {circles.map((circle) => (
@@ -250,6 +259,7 @@ function App() {
                 strokeWidth={2}
                 fill={circle.fillColor}
                 draggable={isDraggable}
+                onClick={onClick}
               />
             ))}
             {arrows.map((arrow) => (
@@ -260,6 +270,7 @@ function App() {
                 strokeWidth={2}
                 fill={arrow.fillColor}
                 draggable={isDraggable}
+                onClick={onClick}
               />
             ))}
             {scribbles.map((scribble) => (
@@ -272,8 +283,10 @@ function App() {
                 strokeWidth={2}
                 fill={scribble.fillColor}
                 draggable={isDraggable}
+                onClick={onClick}
               />
             ))}
+            <Transformer ref={transformerRef}/>
           </Layer>
         </Stage>
 
